@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "15595329214",
+    "project_id": "tp-flutterbase",
+    "storage_bucket": "tp-flutterbase.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:15595329214:android:5b8ed913b6c10ed776f0ef",
+        "android_client_info": {
+          "package_name": "com.example.tp_flutterbase"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCuz7pi_lKdhGXmnG13APL1vRolUkKNbg8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
