@@ -1,4 +1,12 @@
 part of 'post_bloc.dart';
 
 @immutable
-abstract class PostEvent {}
+abstract class PostsEvent {}
+
+
+
+class GetAllPosts extends PostsEvent {
+  final int count;
+
+  GetAllPosts(this.count);
+}
