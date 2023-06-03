@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:tp_flutterbase/home_screen/data_sources/posts_data_source.dart';
 
 import '../models/post.dart';
@@ -5,13 +6,21 @@ import '../models/post.dart';
 class FireStorePostsDataSource extends PostsDataSource {
   @override
   Future<List<Post>> getPosts() async {
-    await Future.delayed(const Duration(seconds: 2));
-    return List.generate(10, (index) {
-      return Post(
-        id: '$index',
-        title: 'Titre $index',
-        description: 'Description $index',
+    QuerySnapshot querySnapshot =
+        await FirebaseFirestore.instance.collection('posts').get();
+
+    List<Post> posts = [];
+
+    querySnapshot.docs.forEach((doc) {
+      Map<String, dynamic>? data = doc.data() as Map<String, dynamic>?;
+      Post post = Post(
+        id: doc.id,
+        title: data?['title'],
+        description: data?['description'],
       );
+      posts.add(post);
     });
+
+    return posts;
   }
 }

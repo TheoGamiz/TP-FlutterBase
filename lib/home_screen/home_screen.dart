@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter/src/widgets/placeholder.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:tp_flutterbase/home_screen/new_post.dart';
 import 'package:tp_flutterbase/home_screen/post_bloc/post_bloc.dart';
+import 'package:tp_flutterbase/home_screen/post_detail_screen.dart';
 import 'package:tp_flutterbase/home_screen/repository/post_repository.dart';
 
 import 'models/post.dart';
@@ -18,7 +20,7 @@ class HomeScreen extends StatelessWidget {
       )..add(GetAllPosts(10)),
       child: Scaffold(
         appBar: AppBar(
-          title: Text("Test"),
+          title: Text("Liste des posts"),
         ),
         body: BlocBuilder<PostsBloc, PostsState>(
               builder: (context, state) {
@@ -56,8 +58,8 @@ class HomeScreen extends StatelessWidget {
               },
             ),
             floatingActionButton: FloatingActionButton(
-              child: const Icon(Icons.refresh),
-              onPressed: () => _onRefreshList(context),
+              child: const Icon(Icons.add),
+              onPressed: () => showCustomModal(context),
             ),
           )
     );
@@ -71,7 +73,34 @@ class HomeScreen extends StatelessWidget {
   }
 
   void _onPostTap(BuildContext context, Post post) {
-    //PostDetailScreen.navigateTo(context, post);
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => PostDetailScreen(post: post,)),
+    );
+  }
+
+  void showCustomModal(BuildContext context) {
+    double screenHeight = MediaQuery.of(context).size.height;
+    double modalHeight = screenHeight * 0.75;
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      builder: (BuildContext context) {
+        return Container(
+          height: modalHeight,
+          child: Align(
+            alignment: Alignment.bottomCenter,
+            child: GestureDetector(
+              onTap: () {
+                Navigator.of(context).pop();
+              },
+              child: MyFormWidget(),
+            ),
+          ),
+        );
+      },
+    );
   }
 }
       
