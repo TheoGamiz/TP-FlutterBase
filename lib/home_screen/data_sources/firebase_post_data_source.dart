@@ -4,14 +4,13 @@ import '../models/post.dart';
 
 class FireStorePostsDataSource extends PostsDataSource {
   @override
-  Future<List<Post>> getProducts() async {
+  Future<List<Post>> getPosts() async {
     await Future.delayed(const Duration(seconds: 2));
     return List.generate(10, (index) {
       return Post(
         id: '$index',
         title: 'Titre $index',
         description: 'Description $index',
-        
       );
     });
   }
