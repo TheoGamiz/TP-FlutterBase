@@ -1,7 +1,9 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter/src/widgets/placeholder.dart';
 
+import 'edit_post.dart';
 import 'models/post.dart';
 import 'new_post.dart';
 
@@ -30,22 +32,45 @@ class PostDetailScreen extends StatelessWidget {
           vertical: 10,
           horizontal: 20,
         ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(post.title),
-            Text(post.description),
-            const Spacer(),
-            Row(
+        child: StreamBuilder<DocumentSnapshot>(
+          stream: FirebaseFirestore.instance
+              .collection('posts')
+              .doc(post.id)
+              .snapshots(),
+          builder: (context, snapshot) {
+            if (snapshot.hasError) {
+              return Text('Error: ${snapshot.error}');
+            }
+
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return CircularProgressIndicator();
+            }
+
+            if (!snapshot.hasData || !snapshot.data!.exists) {
+              return Text('Post not found');
+            }
+
+            final updatedPost = Post.fromDocumentSnapshot(snapshot.data!);
+
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Spacer(),
-                FloatingActionButton(
-                  child: const Icon(Icons.edit),
-                  onPressed: () => showCustomModal(context),
+                Text(updatedPost.title),
+                Text(updatedPost.description),
+                Text(updatedPost.id),
+                const Spacer(),
+                Row(
+                  children: [
+                    Spacer(),
+                    FloatingActionButton(
+                      child: const Icon(Icons.edit),
+                      onPressed: () => showCustomModal(context, updatedPost.id),
+                    ),
+                  ],
                 ),
               ],
-            ),
-          ],
+            );
+          },
         ),
       ),
     );
@@ -65,7 +90,7 @@ class PostDetailScreen extends StatelessWidget {
 }
 
 
-void showCustomModal(BuildContext context) {
+void showCustomModal(BuildContext context, String id) {
   double screenHeight = MediaQuery.of(context).size.height;
   double modalHeight = screenHeight * 0.75;
 
@@ -81,7 +106,7 @@ void showCustomModal(BuildContext context) {
             onTap: () {
               Navigator.of(context).pop();
             },
-            child: MyFormWidget(),
+            child: MyEditFormWidget(id: id,),
           ),
         ),
       );

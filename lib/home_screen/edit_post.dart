@@ -4,12 +4,17 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'post_bloc/post_bloc.dart';
 import 'repository/post_repository.dart';
 
-class MyFormWidget extends StatefulWidget {
+class MyEditFormWidget extends StatefulWidget {
+
+  final String id;
+
+  MyEditFormWidget({required this.id});
+
   @override
-  _MyFormWidgetState createState() => _MyFormWidgetState();
+  _MyEditFormWidgetState createState() => _MyEditFormWidgetState();
 }
 
-class _MyFormWidgetState extends State<MyFormWidget> {
+class _MyEditFormWidgetState extends State<MyEditFormWidget> {
   final _formKey = GlobalKey<FormState>();
   TextEditingController _titleController = TextEditingController();
   TextEditingController _descriptionController = TextEditingController();
@@ -71,7 +76,7 @@ class _MyFormWidgetState extends State<MyFormWidget> {
                   String description = _descriptionController.text;
 
                   bloc.add(
-                      AddPost(title, description)); // Ajout du post via le bloc
+                      EditPost( title, description, widget.id)); // Ajout du post via le bloc
                   _titleController.clear();
                   _descriptionController.clear();
                   Navigator.of(context).pop();
