@@ -1,7 +1,4 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/src/widgets/framework.dart';
-import 'package:flutter/src/widgets/placeholder.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'post_bloc/post_bloc.dart';
@@ -88,4 +85,3 @@ class _MyFormWidgetState extends State<MyFormWidget> {
     );
   }
 }
-

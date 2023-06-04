@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter/src/widgets/placeholder.dart';
@@ -8,74 +9,71 @@ import 'package:tp_flutterbase/home_screen/post_detail_screen.dart';
 import 'package:tp_flutterbase/home_screen/repository/post_repository.dart';
 
 import 'models/post.dart';
+import 'post_bloc/post_bloc.dart';
 import 'post_item.dart';
 
 class HomeScreen extends StatelessWidget {
-  const HomeScreen({super.key});
+  const HomeScreen({Key? key});
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (context) => PostsBloc(repository:  RepositoryProvider.of<PostsRepository>(context),
-      )..add(GetAllPosts(10)),
-      child: Scaffold(
-        appBar: AppBar(
-          title: Text("Liste des posts"),
-        ),
-        body: BlocBuilder<PostsBloc, PostsState>(
-              builder: (context, state) {
-                switch (state.status) {
-                  case PostsStatus.initial:
-                    return const SizedBox();
-                  case PostsStatus.loading:
-                    return const Center(
-                      child: CircularProgressIndicator(),
-                    );
-                  case PostsStatus.error:
-                    return Center(
-                      child: Text(state.error),
-                    );
-                  case PostsStatus.success:
-                    final posts = state.posts;
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text("Liste des posts"),
+      ),
+      body: StreamBuilder<QuerySnapshot>(
+        stream: FirebaseFirestore.instance.collection('posts').snapshots(),
+        builder: (context, snapshot) {
+          if (snapshot.hasError) {
+            // Gérer les erreurs
+            return const Text('Une erreur s\'est produite.');
+          }
 
-                    if (posts.isEmpty) {
-                      return const Center(
-                        child: Text('Aucun produit'),
-                      );
-                    }
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            // Afficher un indicateur de chargement
+            return const Center(child: CircularProgressIndicator());
+          }
 
-                    return ListView.builder(
-                      itemCount: posts.length,
-                      itemBuilder: (context, index) {
-                        final post = posts[index];
-                        return PostItem(
-                          post: post,
-                          onTap: () => _onPostTap(context, post),
-                        );
-                      },
-                    );
-                }
+          if (snapshot.hasData) {
+            final posts = snapshot.data!.docs
+                .map((doc) => Post.fromDocumentSnapshot(doc))
+                .toList();
+
+            if (posts.isEmpty) {
+              // Aucun post disponible
+              return const Center(child: Text('Aucun post disponible.'));
+            }
+
+            // Afficher la liste des posts
+            return ListView.builder(
+              itemCount: posts.length,
+              itemBuilder: (context, index) {
+                final post = posts[index];
+                return PostItem(
+                  post: post,
+                  onTap: () => _onPostTap(context, post),
+                );
               },
-            ),
-            floatingActionButton: FloatingActionButton(
-              child: const Icon(Icons.add),
-              onPressed: () => showCustomModal(context),
-            ),
-          )
+            );
+          }
+
+          // Aucune donnée disponible
+          return const Center(child: Text('Aucun post disponible.'));
+        },
+      ),
+      floatingActionButton: FloatingActionButton(
+        child: const Icon(Icons.add),
+        onPressed: () => showCustomModal(context),
+      ),
     );
-  }
-
-
-
-  void _onRefreshList(BuildContext context) {
-    final postsBloc = BlocProvider.of<PostsBloc>(context);
-    postsBloc.add(GetAllPosts(10));
   }
 
   void _onPostTap(BuildContext context, Post post) {
     Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => PostDetailScreen(post: post,)),
+      MaterialPageRoute(
+        builder: (context) => PostDetailScreen(post: post),
+      ),
     );
   }
 
@@ -103,4 +101,3 @@ class HomeScreen extends StatelessWidget {
     );
   }
 }
-      
